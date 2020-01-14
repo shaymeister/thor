@@ -34,16 +34,12 @@ experience.
 
 Approximate Total w/ Tax: ~$767
 
-## Hypothetical Project Results and Milestones
+## Initial Project Milestone
 
-Jarvis will have the capability to pilot an automotive in any environment from
-the arctic tundra to the Sahara desert given detailed mapping and GPS
-coordinates.
-
-1. Develop a simulation that takes input from a neuromorphic computer with the
+Develop a simulation that takes input from a neuromorphic computer with the
 capability to connect with GPS coordinate and mapping systems. Using spiking
 neural networks, machine learning, and artificial intelligence, Jarvis will
-pilot the vehicle through as series of pre-programmed simulations representing
+pilot the vehicle through a series of pre-programmed simulations representing
 different environments.
 
 ## Contributors
