@@ -31,3 +31,17 @@ x_test = x_test.reshape(10000, 784)
 # convert the data to float
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
+
+# normalize the data
+x_train = (x_train - np.mean(x_train)) / np.std(x_train)
+x_test = (x_test - np.mean(x_train)) / np.std(x_train)
+
+# display the number of training and test data
+print(x_train.shape[0], 'train samples')
+print(x_test.shape[0], 'test samples')
+
+# convert class vectors to binary class matricies
+y_train = np_utils.to_categorical(y_train, nb_classes)
+y_test = np_utils.to_categorical(y_test, nb_classes)
+
+
