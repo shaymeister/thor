@@ -54,3 +54,8 @@ model.add(Activation('relu'))
 model.add(Dropout(0.2))
 model.add(Dense(10))
 model.add(Activation('softmax'))
+
+# implement optimizer
+rms = RMSprop()
+model.compile(loss='categorical_crossentrophy', optimizer=rms, metrics=["accuracy"])
+
