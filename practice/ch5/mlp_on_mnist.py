@@ -57,5 +57,13 @@ model.add(Activation('softmax'))
 
 # implement optimizer
 rms = RMSprop()
-model.compile(loss='categorical_crossentrophy', optimizer=rms, metrics=["accuracy"])
+model.compile(loss='categorical_crossentropy', optimizer=rms, metrics=["accuracy"])
 
+# fit the model
+model.fit(x_train, y_train, batch_size=batch_size, epochs=nb_epoch,
+         verbose=2, validation_data=(x_test, y_test))
+
+# evaluate model performance
+score = model.evaluate(x_test, y_test, verbose=0)
+print('Test score:', score[0])
+print('Test accuracy:', score[1])
