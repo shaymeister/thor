@@ -3,14 +3,6 @@ import argparse
 def create_parser():
     """ Creating main parser
 
-    Summary
-    -------
-    N/A
-
-    Parameters
-    ----------
-    N/A
-
     Returns
     -------
         args : argparse 'parser' object
@@ -20,13 +12,13 @@ def create_parser():
     parser = argparse.ArgumentParser(description = "How to control Thor.")
 
     parser.add_argument('--kitt',
-                        dest='kitt',
-                        action="store_true",
-                        help='Start K.I.T.T')
+                        dest   = 'kitt',
+                        action = 'store_true',
+                        help   = 'Start K.I.T.T')
     parser.add_argument('--vision',
-                        dest='vision',
-                        action="store_true",
-                        help='Start Vision')
+                        dest   = 'vision',
+                        action = 'store_true',
+                        help   = 'Start Vision')
 
     args = parser.parse_args()
 
