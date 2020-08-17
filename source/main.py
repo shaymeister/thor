@@ -1,6 +1,6 @@
 import argparse
 
-def create_parser():
+def create_argparser():
     """ Creating main parser
 
     Returns
@@ -25,13 +25,16 @@ def create_parser():
     return args
 
 def main():
-    args = create_parser()
 
+    args = create_argparser()
+    
     if args.kitt:
         print("Start KITT")
 
     if args.vision:
         print("Start Vision")
 
+# Determine if vision_main.py is being executed
+# directly or from another script
 if __name__ == "__main__":
     main()

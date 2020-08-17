@@ -16,6 +16,10 @@ def create_argparser():
                         action = 'store_true',
                         help = "Start S")
 
+    args = parser.parse_args()
+
+    return args
+
 def create_regex_parser():
     # TODO Finish Implementation
     print("WARNING: this feature is not currently enabled. To use Vision, "
@@ -24,9 +28,9 @@ def create_regex_parser():
 
 def main(flag):
     if flag:
-        create_argparser
+        args = create_argparser
     else:
-        create_regex_parser
+        args = create_regex_parser
 
 # Determine if vision_main.py is being executed
 # directly or from another script
