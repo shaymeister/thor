@@ -1,7 +1,11 @@
 import argparse
 
 def create_argparser():
-    """ Creating main parser
+    """create command line parser using argparse
+
+    Arguments
+    ---------
+    TODO Detail Arguments
 
     Returns
     -------
@@ -25,6 +29,7 @@ def create_argparser():
     return args
 
 def main():
+    """starting node for Thor"""
 
     args = create_argparser()
     
