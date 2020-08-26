@@ -1,4 +1,5 @@
 import argparse
+import Vision
 
 def create_argparser():
     """create command line parser using argparse
@@ -37,7 +38,11 @@ def main():
         print("Start KITT")
 
     if args.vision:
-        print("Start Vision")
+        print("Starting Vision")
+
+        cam = Vision.Camera()
+
+        cam.record(show_view = True)
 
 # Determine if vision_main.py is being executed
 # directly or from another script
