@@ -41,7 +41,7 @@ class Camera:
         """Record via the usb camera"""
 
         # define video source
-        stream = cv2.VideoCapture(0)
+        stream = cv2.VideoCapture(1)
 
         # check if the video stream is able to be accessed
         if (stream.isOpened()):
@@ -52,7 +52,7 @@ class Camera:
         # define codec and create VideoWriter
         codec = 'X264'
         fourcc = cv2.VideoWriter_fourcc(*codec)
-        out = cv2.VideoWriter('~/Videos/thor/recording.avi', fourcc, 60, (1920, 1080))
+        out = cv2.VideoWriter('videos/recording.avi', fourcc, 60, (1920, 1080))
 
         # start the streaming loop
         while(stream.isOpened()):

@@ -42,7 +42,7 @@ def main():
 
         cam = Vision.Camera()
 
-        cam.record(show_view = True)
+        cam.record(show_view = False)
 
 # Determine if vision_main.py is being executed
 # directly or from another script
