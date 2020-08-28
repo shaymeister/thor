@@ -2,8 +2,15 @@ import numpy as np
 import cv2
 
 class Camera:
+    """Manage and control the USB camera"""
+    cam_num = 1 # 1 is the usb cam on thor
+
     def __init__(self):
         print("Vision: Initialized Camera")
+
+    def setCamNum(self, int):
+        """Change the cam_num attribute to the argued value"""
+        self.cam_num = int
 
     def show_view(self):
         """Show the current camera's view"""
@@ -41,7 +48,8 @@ class Camera:
         """Record via the usb camera"""
 
         # define video source
-        stream = cv2.VideoCapture(1)
+        CAM_NUM = 1
+        stream = cv2.VideoCapture(CAM_NUM)
 
         # check if the video stream is able to be accessed
         if (stream.isOpened()):
@@ -50,9 +58,11 @@ class Camera:
             print("Unable to access camera.")
 
         # define codec and create VideoWriter
-        codec = 'X264'
-        fourcc = cv2.VideoWriter_fourcc(*codec)
-        out = cv2.VideoWriter('videos/recording.avi', fourcc, 60, (1920, 1080))
+        CODEC = 'X264'
+        fourcc = cv2.VideoWriter_fourcc(*CODEC)
+        FPS = 60
+        RES = (1920, 1080)
+        out = cv2.VideoWriter('videos/recording.avi', fourcc, FPS, RES)
 
         # start the streaming loop
         while(stream.isOpened()):
@@ -72,7 +82,8 @@ class Camera:
                 cv2.imshow("Current View", frame)
 
             # run until key press 'q'
-            if cv2.waitKey(1) == ord('q'):
+            QUIT_KEY = 'q'
+            if cv2.waitKey(1) == ord(QUIT_KEY):
                 break
 
         # release the capture
