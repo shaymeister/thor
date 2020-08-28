@@ -34,7 +34,7 @@ def create_argparser():
                               default = -1,
                               help = "Set desired camera for vision pkg")
     vision_group.add_argument('--show_cam',
-                              dest = 'show_view',
+                              dest = 'show_cam',
                               action = 'store_true',
                               help = 'Show camera view in GUI')        
 

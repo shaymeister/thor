@@ -1,6 +1,5 @@
-practice/cv/cv/
-venv/
 .vscode
 .DS_Store
 **/__pycache__/**
 data/
+videos/

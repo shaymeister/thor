@@ -1,5 +1,6 @@
-import numpy as np
 import cv2
+from datetime import datetime
+import numpy as np
 
 class Camera:
     """Manage and control the USB camera"""
@@ -48,8 +49,7 @@ class Camera:
         """Record via the usb camera"""
 
         # define video source
-        CAM_NUM = 1
-        stream = cv2.VideoCapture(CAM_NUM)
+        stream = cv2.VideoCapture(self.cam_num)
 
         # check if the video stream is able to be accessed
         if (stream.isOpened()):
@@ -62,7 +62,9 @@ class Camera:
         fourcc = cv2.VideoWriter_fourcc(*CODEC)
         FPS = 60
         RES = (1920, 1080)
-        out = cv2.VideoWriter('videos/recording.avi', fourcc, FPS, RES)
+        date = datetime.now().strftime("%D-%M-%Y_%H:%M:%S%P")
+        out = cv2.VideoWriter('videos/recording_' + date +'.avi',
+                              fourcc, FPS, RES)
 
         # start the streaming loop
         while(stream.isOpened()):
