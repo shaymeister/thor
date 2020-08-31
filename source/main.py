@@ -1,4 +1,5 @@
 import argparse
+import sys
 import Kitt
 import Vision
 
@@ -18,25 +19,29 @@ def create_argparser():
     parser = argparse.ArgumentParser(description = "How to control Thor.")
 
     kitt_group = parser.add_argument_group('kitt_group')
-    kitt_group.add_argument('--kitt',
+    kitt_group.add_argument('-k', '--kitt',
                             dest   = 'kitt',
                             action = 'store_true',
                             help   = 'Start K.I.T.T')
 
     vision_group = parser.add_argument_group("vision_group")
-    vision_group.add_argument('--vision',
+    vision_group.add_argument('-v', '--vision',
                               dest   = 'vision',
                               action = 'store_true',
                               help   = 'Start Vision')
     vision_group.add_argument('--cam_num',
-                              dest = 'cam_num',
-                              type = int,
+                              dest    = 'cam_num',
+                              type    = int,
                               default = -1,
-                              help = "Set desired camera for vision pkg")
+                              help    = "Set desired camera for vision pkg")
     vision_group.add_argument('--show_cam',
-                              dest = 'show_cam',
+                              dest   = 'show_cam',
                               action = 'store_true',
-                              help = 'Show camera view in GUI')        
+                              help   = 'Show camera view in GUI')        
+    vision_group.add_argument('-t', '-test',
+                            dest   = 'testing',
+                            action = 'store_true',
+                            help   = 'Activate testing mode')
 
     args = parser.parse_args()
 
@@ -62,6 +67,14 @@ def start_vision(args):
     print("Starting Vision")
 
     cam = Vision.Camera()
+
+    # activate settings for testing
+    TEST_CAM_NUM = 0
+    if args.testing:
+        cam.setCamNum(TEST_CAM_NUM)
+        cam.record(show_view = True)
+        sys.exit("Closing Vision")
+        
 
     # change cam_num if different from default
     DEFAULT_CAM_NUM = -1

@@ -54,15 +54,13 @@ class Camera:
         # check if the video stream is able to be accessed
         if (stream.isOpened()):
             print("Starting Camera.")
-        else:
-            print("Unable to access camera.")
 
         # define codec and create VideoWriter
         CODEC = 'X264'
         fourcc = cv2.VideoWriter_fourcc(*CODEC)
         FPS = 60
         RES = (1920, 1080)
-        date = datetime.now().strftime("%D-%M-%Y_%H:%M:%S%P")
+        date = datetime.now()
         out = cv2.VideoWriter('videos/recording_' + date +'.avi',
                               fourcc, FPS, RES)
 
