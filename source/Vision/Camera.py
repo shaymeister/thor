@@ -61,8 +61,12 @@ class Camera:
         FPS = 60
         RES = (1920, 1080)
         date = datetime.now()
-        out = cv2.VideoWriter('videos/recording_' + date +'.avi',
-                              fourcc, FPS, RES)
+        out = cv2.VideoWriter('videos/recording_'
+                                + str(date.month) + '-'
+                                + str(date.day) + '-'
+                                + str(date.year) + '_'
+                                + date.strftime('%X')
+                                + '.avi', fourcc, FPS, RES)
 
         # start the streaming loop
         while(stream.isOpened()):
