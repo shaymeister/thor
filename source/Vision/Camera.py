@@ -2,6 +2,8 @@ import cv2
 from datetime import datetime
 import numpy as np
 
+from .Detect import Detect
+
 class Camera:
     """Manage and control the USB camera"""
     cam_num = 1 # 1 is the usb cam on thor
@@ -94,3 +96,59 @@ class Camera:
         stream.release()
         out.release()
         cv2.destroyAllWindows()
+
+    def detect(self):
+        
+        # define video source
+        stream = cv2.VideoCapture(self.cam_num)
+
+        # check if the video stream is able to be accessed
+        if (stream.isOpened()):
+            print("Starting Camera.")
+
+        # define codec and create VideoWriter
+        CODEC = 'X264'
+        fourcc = cv2.VideoWriter_fourcc(*CODEC)
+        FPS = 60
+        RES = (1920, 1080)
+        date = datetime.now()
+        out = cv2.VideoWriter('videos/recording_'
+                                + str(date.month) + '-'
+                                + str(date.day) + '-'
+                                + str(date.year) + '_'
+                                + date.strftime('%X')
+                                + '.avi', fourcc, FPS, RES)
+
+        # initialize detector
+        detector = Detect()
+        detector.start()
+
+        # start the streaming loop
+        while(stream.isOpened()):
+            # capture frame by frame
+            ret, frame = stream.read()
+
+            # make sure the frames are reading
+            if not ret:
+                print("Unable to receive frame.")
+                break
+
+            # write the frame
+            out.write(frame)
+
+            # show frame
+            # TODO Update Following If-statement
+            if 1 == 1:
+                cv2.imshow("God's Eye", detector.detect(frame))
+
+            # run until key press 'q'
+            QUIT_KEY = 'q'
+            if cv2.waitKey(1) == ord(QUIT_KEY):
+                break
+
+        # release the capture
+        stream.release()
+        out.release()
+        cv2.destroyAllWindows()
+
+

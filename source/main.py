@@ -72,16 +72,13 @@ def start_vision(args):
     TEST_CAM_NUM = 0
     if args.testing:
         cam.setCamNum(TEST_CAM_NUM)
-        cam.record(show_view = True)
-        sys.exit("Closing Vision")
-        
 
     # change cam_num if different from default
     DEFAULT_CAM_NUM = -1
     if args.cam_num != -1:
         cam.setCamNum(args.cam_num)
 
-    cam.record(show_view = args.show_cam)
+    cam.detect()
 
 # Determine if vision_main.py is being executed
 # directly or from another script
