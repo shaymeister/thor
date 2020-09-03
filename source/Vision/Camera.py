@@ -58,17 +58,17 @@ class Camera:
             print("Starting Camera.")
 
         # define codec and create VideoWriter
-        CODEC = 'X264'
+        CODEC = 'XVID'
         fourcc = cv2.VideoWriter_fourcc(*CODEC)
-        FPS = 60
-        RES = (1920, 1080)
+        FPS = 30
+        RES = (640, 480)
         date = datetime.now()
         out = cv2.VideoWriter('videos/recording_'
                                 + str(date.month) + '-'
                                 + str(date.day) + '-'
                                 + str(date.year) + '_'
                                 + date.strftime('%X')
-                                + '.avi', fourcc, FPS, RES)
+                                + '.avi', fourcc, FPS, RES, True)
 
         # start the streaming loop
         while(stream.isOpened()):
@@ -107,10 +107,11 @@ class Camera:
             print("Starting Camera.")
 
         # define codec and create VideoWriter
-        CODEC = 'X264'
+        CODEC = 'XVID'
         fourcc = cv2.VideoWriter_fourcc(*CODEC)
-        FPS = 60
-        RES = (1920, 1080)
+        FPS = 30
+        RES = (640, 480)
+        TENSOR_RES = (800, 600)
         date = datetime.now()
         out = cv2.VideoWriter('videos/recording_'
                                 + str(date.month) + '-'
@@ -123,7 +124,7 @@ class Camera:
                         + str(date.day) + '-'
                         + str(date.year) + '_'
                         + date.strftime('%X')
-                        + '.avi', fourcc, FPS, RES)
+                        + '.avi', fourcc, FPS, TENSOR_RES)
 
         # initialize detector
         detector = Detect()

@@ -77,7 +77,7 @@ def start_vision(args):
     if args.cam_num != -1:
         cam.setCamNum(args.cam_num)
 
-    cam.record(show_view =True)
+    cam.detect()
 
 # Determine if vision_main.py is being executed
 # directly or from another script
