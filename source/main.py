@@ -1,6 +1,5 @@
 import argparse
 import sys
-import Kitt
 import Vision
 
 def create_argparser():
@@ -78,7 +77,7 @@ def start_vision(args):
     if args.cam_num != -1:
         cam.setCamNum(args.cam_num)
 
-    cam.detect()
+    cam.record(show_view =True)
 
 # Determine if vision_main.py is being executed
 # directly or from another script

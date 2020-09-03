@@ -118,6 +118,12 @@ class Camera:
                                 + str(date.year) + '_'
                                 + date.strftime('%X')
                                 + '.avi', fourcc, FPS, RES)
+        out2 = cv2.VideoWriter('videos/recording_detect_'
+                        + str(date.month) + '-'
+                        + str(date.day) + '-'
+                        + str(date.year) + '_'
+                        + date.strftime('%X')
+                        + '.avi', fourcc, FPS, RES)
 
         # initialize detector
         detector = Detect()
@@ -136,10 +142,16 @@ class Camera:
             # write the frame
             out.write(frame)
 
+            # send the frame through the object detector
+            frame = detector.detect(frame)
+
+            # write the modified frame
+            out2.write(frame)
+
             # show frame
             # TODO Update Following If-statement
             if 1 == 1:
-                cv2.imshow("God's Eye", detector.detect(frame))
+                cv2.imshow("God's Eye", frame)
 
             # run until key press 'q'
             QUIT_KEY = 'q'
@@ -149,6 +161,7 @@ class Camera:
         # release the capture
         stream.release()
         out.release()
+        out2.release()
         cv2.destroyAllWindows()
 
 
