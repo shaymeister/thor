@@ -1,3 +1,5 @@
+import argparse
+
 class Config():
     """
     TODO Finish Documentation (Numpy Style)
@@ -53,4 +55,11 @@ class Config():
             help   = 'Activate testing mode')
 
         args = parser.parse_args()
-con
+
+    def parse_args(self, args):
+        """
+        TODO Finish Documentation
+        """
+
+    def getStartVision(self):
+        return False

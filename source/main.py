@@ -1,15 +1,21 @@
-import Config
+from Config import Config
 import Vision
 
-def main():
+def main(config):
     """starting node for Thor"""
 
-    if args.vision:
+    if config.getStartVision():
         start_vision(args)
 
 
 # Determine if vision_main.py is being executed
 # directly or from another script
 if __name__ == "__main__":
-    
-    main(Config.create_argparser())
+    # create Config object
+    config = Config()
+
+    # create cmd-line parser
+    config.create_argparser()
+
+    # start
+    main(config)
