@@ -53,6 +53,9 @@ class Camera:
         # define video source
         stream = cv2.VideoCapture(self.cam_num)
 
+        # define streamer
+        streamer = Streamer(80, False)
+
         # check if the video stream is able to be accessed
         if (stream.isOpened()):
             print("Starting Camera.")
@@ -67,7 +70,9 @@ class Camera:
                                 + str(date.month) + '-'
                                 + str(date.day) + '-'
                                 + str(date.year) + '_'
-                                + date.strftime('%X')
+                                + str(date.hour) + '-'
+                                + str(date.minute) + '-'
+                                + str(date.second) + '_'
                                 + '.avi', fourcc, FPS, RES, True)
 
         # start the streaming loop
@@ -85,7 +90,11 @@ class Camera:
 
             # show frame
             if show_view:
+                streamer.update_frame(frame)
                 cv2.imshow("Current View", frame)
+
+                if not streamer.is_streaming:
+                    streamer.start_streaming
 
             # run until key press 'q'
             QUIT_KEY = 'q'

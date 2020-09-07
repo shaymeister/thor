@@ -1,12 +1,13 @@
 # import required libraries
 from vidgear.gears import NetGear
+from datetime import datetime
 import cv2
 
 # define tweak flags
 options = {'flag' : 0, 'copy' : False, 'track' : False}
 
 # Define Netgear Client at given IP address and define parameters (!!! change following IP address '192.168.x.xxx' with yours !!!)
-client = NetGear(address = '192.168.1.175', port = '5454', protocol = 'tcp',  pattern = 0, receive_mode = True, logging = True, **options)
+client = NetGear(address = '172.16.4.182', port = '5454', protocol = 'tcp',  pattern = 0, receive_mode = True, logging = True, **options)
 
 # loop over
 while True:

@@ -3,57 +3,46 @@ from vidgear.gears import NetGear
 from datetime import datetime
 import cv2
 
-# Open suitable video stream, such as webcam on first index(i.e. 0)
-stream = cv2.VideoCapture(0) 
+stream = cv2.VideoCapture(0)
 
-# define tweak flags
-options = {'flag' : 0, 'copy' : False, 'track' : False}
+if (stream.isOpened()):
+            print("Starting Camera.")
 
-# Define Netgear Client at given IP address and define parameters (!!! change following IP address '192.168.x.xxx' with yours !!!)
-server = NetGear(address = '192.168.1.175', port = '5454', protocol = 'tcp',  pattern = 0, logging = True, **options)
-
-# define writer
+        # define codec and create VideoWriter
 CODEC = 'XVID'
-fourcc = cv2.VideoWriter_fourcc(*CODEC)
 FPS = 30
-RES = (640, 480)
+RES = (1920, 1080)
+fourcc = cv2.VideoWriter_fourcc(*CODEC)
 date = datetime.now()
 out = cv2.VideoWriter('videos/recording_'
-    + str(date.month) + '-'
-    + str(date.day) + '-'
-    + str(date.year) + '_'
-    + str(date.hour) + '-'
-    + str(date.minute) + '-'
-    + str(date.second) + '_'
-    + '.avi', fourcc, FPS, RES, True)
+                                + str(date.month) + '-'
+                                + str(date.day) + '-'
+                                + str(date.year) + '_'
+                                + str(date.hour) + '-'
+                                + str(date.minute) + '-'
+                                + str(date.second) + '_'
+                                + '.avi', fourcc, FPS, RES, True)
+# start the streaming loop
+while(stream.isOpened()):
+    # capture frame by frame
+    ret, frame = stream.read()
 
-# loop over until KeyBoard Interrupted
-while True:
+    # make sure the frames are reading
+    if not ret:
+        print("Unable to receive frame.")
+        break
 
-  try: 
-
-    # read frames from stream
-    (grabbed, frame) = stream.read()
-
-    # check for frame if not grabbed
-    if not grabbed:
-      break
-
-    print(frame.shape)
-
-    # save the frame
+    # write the frame
     out.write(frame)
 
-    # send frame to server
-    server.send(frame)
+    # show frame
+    if True:
 
-  except KeyboardInterrupt:
-    break
+        cv2.imshow("Current View", frame)
 
-# safely close video stream
-stream.release()
-
-# safely close server
-server.close()
-
+    # run until key press 'q'
+    QUIT_KEY = 'q'
+    if cv2.waitKey(1) == ord(QUIT_KEY):
+        stream.release()
 out.release()
+cv2.destroyAllWindows()
