@@ -1,5 +1,10 @@
+# This .yaml file specifies various settings of Thor; if you would like to
+# create your own .yaml for thor, please follow template.yaml
+
 # options for K.I.T.T. pkg
 Kitt:
+  START: False
 
 # options for Vision pkg
 Vision:
+  START: False

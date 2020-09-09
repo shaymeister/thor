@@ -71,8 +71,8 @@ class Config():
         self._CONFIG.VISION = CN()
 
         # start Vision module at runtime (True / False)
-        self._CONFIG.VISION.START_VISION = False
+        self._CONFIG.VISION.START = False
 
     def getVisionStart(self):
         """return boolean specifying whether to start Vision at runtime"""
-        return self._CONFIG.VISION.START_VISION
+        return self._CONFIG.VISION.START
