@@ -4,9 +4,8 @@ import Vision
 def main(config):
     """starting node for Thor"""
 
-    if config.getStartVision():
-        start_vision(args)
-
+    if config.getVisionStart():
+        start_vision(config)
 
 # Determine if vision_main.py is being executed
 # directly or from another script
