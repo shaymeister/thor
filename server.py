@@ -1,5 +1,4 @@
 # import required libraries
-from vidgear.gears import NetGear
 from datetime import datetime
 import cv2
 
@@ -37,7 +36,6 @@ while(stream.isOpened()):
 
     # show frame
     if True:
-
         cv2.imshow("Current View", frame)
 
     # run until key press 'q'
