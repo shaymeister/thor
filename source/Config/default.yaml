@@ -2,9 +2,9 @@
 # create your own .yaml for thor, please follow template.yaml
 
 # options for K.I.T.T. pkg
-Kitt:
+KITT:
   START: False
 
 # options for Vision pkg
-Vision:
+VISION:
   START: False

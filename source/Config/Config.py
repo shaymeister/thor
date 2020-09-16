@@ -61,6 +61,9 @@ class Config():
         # create Kitt section in config
         self._CONFIG.KITT = CN()
 
+        # start Kitt module at runtime (True / False)
+        self._CONFIG.KITT.START = False
+
     def _initVisionConfig(self):
         """
         TODO Finish Documentation (Numpy Style)
@@ -76,3 +79,7 @@ class Config():
     def getVisionStart(self):
         """return boolean specifying whether to start Vision at runtime"""
         return self._CONFIG.VISION.START
+
+    def getKittStart(self):
+        """return boolean specifying whether to start Kitt at runtime"""
+        return self._CONFIG.KITT.START
