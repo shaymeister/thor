@@ -1,7 +1,7 @@
 """
 Convert video(s) to specified format
 
-TODO: Detail arguments
+TODO include comments about arguments
 """
 
 import argparse
@@ -18,6 +18,7 @@ class VideoConverter():
     def __init__(self):
         """initialize class variables"""
 
+        # valid codecs
         self.valid_codec = [
             'mp4',
             'avi',
