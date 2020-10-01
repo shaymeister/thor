@@ -8,7 +8,6 @@ import argparse
 import cv2
 import glob
 import imutils
-from 
 import os
 from os import path
 from tqdm import tqdm
@@ -38,7 +37,7 @@ class VideoFilter():
         success = True # flag to id end of video stream
 
         # open video stream
-        video_stream = cv2.VideoCapture(video)
+        video_stream = cv2.VideoCapture(video_path)
 
         # loop through all frames in video_stream
         while success:
@@ -49,7 +48,7 @@ class VideoFilter():
             video.append(frame)
 
         # close video stream
-        video_stream.close()
+        video_stream.release()
         
         # update user
         print("-> Loaded {} frames from {}".format(len(video), video_path))
@@ -90,9 +89,6 @@ class VideoFilter():
             )
             return
 
-        # update user
-        print('-> Found video: {}'.format(file_path))
-
         # assuming the video at file_path passed all tests,
         # add said video to self.videos
         self.videos.append(file_path)
@@ -101,7 +97,7 @@ class VideoFilter():
         """load all videos in argued directory"""
 
         # update user
-        print('--> searching for videos in {}'.format(directory_path))
+        print('--> Searching for videos in {}'.format(directory_path))
 
         # get paths to all videos in argued directory
         videos = glob.glob(
@@ -111,7 +107,7 @@ class VideoFilter():
         )
 
         # update user
-        print('--> found {} videos in {}'.format(len(videos), directory_path))
+        print('--> Found {} videos in {}'.format(len(videos), directory_path))
 
         # loop through all videos; attempt to import each
         for video in videos:
@@ -123,13 +119,13 @@ class VideoFilter():
         # update user
         print('-> Looking for frames with motion')
 
-        motion = [] # specify when there is motion in the video
+        motion = [False] * len(video) # specify when there is motion in the video
 
         # get background
-        background = video[0]
+        background = None
 
         # loop over all frames in the video
-        for i in tqdm(range(len(video))):
+        for i in tqdm(range(len(video) - 1)):
             # get frame at i
             frame = video[i]
             # convert frame to grayscale and blur it
@@ -142,6 +138,10 @@ class VideoFilter():
                 self.blur_region,
                 0
             )
+
+            # check if background has been determined
+            if background is None:
+                background = gray
 
             # compute the difference between the current
             # and first frame
@@ -174,7 +174,7 @@ class VideoFilter():
                     # set the motion at i to True
                     motion[i] = True
                 else:
-                    motion[i] = False
+                    continue
 
         count_true = 0
         count_false = 0
@@ -196,16 +196,16 @@ class VideoFilter():
         """filter video to sections with motion"""
 
         # load video and update user
-        video = load_video(video)
+        video = self.load_video(video_path)
 
         # find motion in video
-        motion_timeline = detect_motion(video, min_area)
+        motion_timeline = self.detect_motion(video, min_area)
 
         # find clips with motion
-        clips = find_clips(motion_timeline)
+        clips = self.find_clips(motion_timeline)
 
         # export clips to save directory
-        export_clips(video, video_path, save_directory, clips)
+        self.export_clips(video, video_path, save_directory, clips)
 
     def filter_videos(self, save_directory, min_area):
         """filter all loaded videos"""
@@ -224,7 +224,7 @@ class VideoFilter():
         """find clips with motion"""
 
         # update user
-        print('-> Looking for video clips with motion')
+        print('-> Looking for video clip(s) with motion')
 
         clips = [] # list of tuples -> start and end of clips w/ motion
 
@@ -245,6 +245,12 @@ class VideoFilter():
             if start_index != None and instance == False:
                 end_index = i - 1
 
+                # make sure the clip is substantial
+                if end_index - start_index < 5:
+                    start_index = None
+                    end_index = None
+                    continue
+                
                 # add clip to clips
                 clip = (start_index, end_index)
                 clips.append(clip)
@@ -255,7 +261,7 @@ class VideoFilter():
                 continue
 
         # update user
-        print('-> Found {} videos clips with motion!'.format(len(clips)))
+        print('-> Found {} video clip(s) with motion!'.format(len(clips)))
 
         # return clips
         return clips
@@ -265,9 +271,10 @@ class VideoFilter():
 
         # get original video base name
         basename = path.basename(video_path)
+        head, tail = os.path.splitext(basename)
         
         # update user
-        print('--> Exporting {} clips from {}'.format(
+        print('-> Exporting {} clip(s) from {}'.format(
             len(clips),
             basename
             )
@@ -279,19 +286,21 @@ class VideoFilter():
             start_index, end_index = clips[i]
 
             # get frames from indexes
-            clip = video[start_index, end_index]
+            clip = video[start_index:end_index]
 
+            # write frames with motion to video
             writer = cv2.VideoWriter(
                 path.join(
                     save_directory,
-                    'clip{}_{}'.format(
+                    '{}_clip{}{}'.format(
+                        head,
                         i,
-                        base_name
+                        tail
                     )
                 ),
                 self.format,
                 self.fps,
-                self.dim
+                self.size
             )
 
             # write all frames in clip to video
@@ -299,14 +308,18 @@ class VideoFilter():
                 writer.write(frame)
 
             # close writer
-            writer.close
+            writer.release()
 
         # update user
-        print('--> Finished exporting {} clips from {}'.format(
+        print('-> Finished exporting {} clip(s) from {}'.format(
             len(clips),
             basename
             )
         )
+
+        # empty major variables
+        video.clear()
+        clips.clear()
 
 def create_argument_parser():
     """create command-line argument parser"""

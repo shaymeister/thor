@@ -1,10 +1,19 @@
 # This .yaml file specifies various settings of Thor; if you would like to
 # create your own .yaml for thor, please follow template.yaml
 
-# options for K.I.T.T. pkg
+# options for K.I.T.T. module
 KITT:
   START: False
 
-# options for Vision pkg
+# options for Vision module
 VISION:
+  CAM_NUMBER: 1
+  DETECT: True
+  FPS: 30
+  IMAGE_SIZE: [640, 480] # width * height
+  RECORD: True
+  SHOW_VIEW: True
   START: False
+  TENSOR_IMAGE_SIZE: [800, 600] # width * height
+  VIDEO_PATH: null
+  

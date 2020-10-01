@@ -65,10 +65,7 @@ class Config():
         self._CONFIG.KITT.START = False
 
     def _initVisionConfig(self):
-        """
-        TODO Finish Documentation (Numpy Style)
-        """
-
+        """Initialize configuration for Vision"""
 
         # create Vision section in config
         self._CONFIG.VISION = CN()
@@ -76,10 +73,71 @@ class Config():
         # start Vision module at runtime (True / False)
         self._CONFIG.VISION.START = False
 
-    def getVisionStart(self):
-        """return boolean specifying whether to start Vision at runtime"""
-        return self._CONFIG.VISION.START
+        # webcam id to receive frames
+        self._CONFIG.VISION.CAM_NUMBER = 1 # usb cam on thor
+
+        # start detect package
+        self._CONFIG.VISION.DETECT = False
+
+        # frame rate to receive from video source
+        self._CONFIG.VISION.FPS = 30
+
+        # image size to receive from video source
+        self._CONFIG.VISION.IMAGE_SIZE = [640, 480]
+
+        # record camera footage
+        self._CONFIG.VISION.RECORD = False
+
+        # show the camera's view on screen
+        self._CONFIG.VISION.SHOW_VIEW = False
+
+        # image size to receive when using detect
+        self._CONFIG.VISION.TENSOR_IMAGE_SIZE = [800, 600]
+
+        # video path to receive frames
+        self._CONFIG.VISION.VIDEO_PATH = None
+
+    # ---------------
+    # getter methods
+    # ---------------
 
     def getKittStart(self):
         """return boolean specifying whether to start Kitt at runtime"""
         return self._CONFIG.KITT.START
+
+    def getVisionCamNum(self):
+        """return integer value representing camera source"""
+        return self._CONFIG.VISION.CAM_NUMBER
+
+    def getVisionDetect(self):
+        """return boolean attribute specifying whether or not to apply object detection"""
+
+    def getVisionFPS(self):
+        """return integer value specifying frame rate to record"""
+        return self._CONFIG.VISION.FPS
+
+    def getVisionImageSize(self):
+        """return list value specifying image size"""
+        return self._CONFIG.VISION.IMAGE_SIZE
+
+    def getVisionRecord(self):
+        """return boolean value specifying whether to record"""
+        return self._CONFIG.VISION.RECORD
+
+    def getVisionShowView(self):
+        """return boolean value specifying the initialization of visuals"""
+        return self._CONFIG.VISION.SHOW_VIEW
+
+    def getVisionStart(self):
+        """return boolean specifying whether to start Vision at runtime"""
+        return self._CONFIG.VISION.START
+
+    def getVisionTensorImageSize(self):
+        """return boolean specifying output of object detection"""
+        return self._CONFIG.VISION.TENSOR_IMAGE_SIZE
+
+    def getVisionVideoPath(self):
+        """return path to prerecorded video(s)"""
+        return self._CONFIG.VISION.VIDEO_PATH
+
+

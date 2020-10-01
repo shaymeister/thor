@@ -6,172 +6,185 @@ from .Detect import Detect
 
 class Camera:
     """Manage and control the USB camera"""
-    cam_num = 1 # 1 is the usb cam on thor
 
-    def __init__(self):
+    # -----------------
+    # class attributes
+    # -----------------
+    
+    # video source
+    cam_num = 1 # 1 is the usb cam on thor
+    video_path = None
+
+    # camera configuration
+    fps = None
+    image_size = None
+    record = None
+    show_view = None
+    tensor_image_size = None
+
+    # streamers and recorder
+    stream = None
+    video_recorder = None
+    video_detect_recorder = None
+
+
+    def __init__(self, cam_num = 1, video_path = None):
+        """Initialize Camera Class"""
+
+        # set class variables
+        self.cam_num = cam_num
+        self.video_path = video_path
+
         print("Vision: Initialized Camera")
 
-    def setCamNum(self, int):
-        """Change the cam_num attribute to the argued value"""
-        self.cam_num = int
+    def configure(self, fps = 30, image_size = [640, 480], record = False,
+            show_view = False, tensor_image_size = [800, 600]):
+        """configure camera specifications"""
+        self.fps = fps
+        self.image_size = image_size
+        self.record = record
+        self.show_view = show_view
+        self.tensor_image_size = tensor_image_size
 
-    def show_view(self):
-        """Show the current camera's view"""
+    def startVideoStream():
+        """load video stream from video or camera"""
+        
+        if video_path is None: # stream from camera
+            stream = cv2.VideoCapture(self.cam_num)
+        elif video_path is not None: # stream from video
+            stream = cv2.VideoCapture(self.video_path)
+        else: # unexpected error
+            print("An unexpected error occured when starting video stream!")
+            sys.exit(0)
 
-        # define video source
-        stream = cv2.VideoCapture(0)
-
-        # check if the video stream is able to be accessed
-        if (stream.isOpened()):
-            print("Starting Camera.")
+        # verify stream functionality
+        if stream.isOpened():
+            print("SUCCESS: loaded Video stream")
         else:
-            print("Unable to access camera.")
+            print("ERROR: unable to load video stream.")
+            sys.exit(0)
 
-        # start the streaming loop
-        while(stream.isOpened()):
-            # capture frame by frame
-            ret, frame = stream.read()
+        # set stream to class attribute
+        self.stream = stream
 
-            # check if frame is captured correctly
-            if not ret:
-                print("Unable to receive frame.")
-
-            # display the frame
-            cv2.imshow("current view", frame)
-
-            # run until key press 'q'
-            if cv2.waitKey(1) == ord('q'):
-                break
-
-        # release the capture
-        stream.release()
-        cv2.destroyAllWindows()
-
-    def record(self, show_view):
-        """Record via the usb camera"""
-
-        # define video source
-        stream = cv2.VideoCapture(self.cam_num)
-
-        # define streamer
-        streamer = Streamer(80, False)
-
-        # check if the video stream is able to be accessed
-        if (stream.isOpened()):
-            print("Starting Camera.")
-
-        # define codec and create VideoWriter
+    def startVideoRecorder():
+        """create recorder for video stream"""
+        
+        # set attributes for video recorder
         CODEC = 'XVID'
         fourcc = cv2.VideoWriter_fourcc(*CODEC)
-        FPS = 30
-        RES = (640, 480)
         date = datetime.now()
-        out = cv2.VideoWriter('videos/recording_'
+
+        # create video recorder
+        self.video_recorder = cv2.VideoWriter('videos/recording_'
                                 + str(date.month) + '-'
                                 + str(date.day) + '-'
                                 + str(date.year) + '_'
                                 + str(date.hour) + '-'
                                 + str(date.minute) + '-'
                                 + str(date.second) + '_'
-                                + '.avi', fourcc, FPS, RES, True)
+                                + '.avi', fourcc, self.fps, self.image_size, True)
 
-        # start the streaming loop
-        while(stream.isOpened()):
-            # capture frame by frame
-            ret, frame = stream.read()
+    def startVideoDetectionRecorder():
+        """create recorder for detection video stream"""
 
-            # make sure the frames are reading
-            if not ret:
-                print("Unable to receive frame.")
-                break
-
-            # write the frame
-            out.write(frame)
-
-            # show frame
-            if show_view:
-                streamer.update_frame(frame)
-                cv2.imshow("Current View", frame)
-
-                if not streamer.is_streaming:
-                    streamer.start_streaming
-
-            # run until key press 'q'
-            QUIT_KEY = 'q'
-            if cv2.waitKey(1) == ord(QUIT_KEY):
-                break
-
-        # release the capture
-        stream.release()
-        out.release()
-        cv2.destroyAllWindows()
-
-    def detect(self):
-        
-        # define video source
-        stream = cv2.VideoCapture(self.cam_num)
-
-        # check if the video stream is able to be accessed
-        if (stream.isOpened()):
-            print("Starting Camera.")
-
-        # define codec and create VideoWriter
+        # set attributes for video recorder
         CODEC = 'XVID'
         fourcc = cv2.VideoWriter_fourcc(*CODEC)
-        FPS = 30
-        RES = (640, 480)
-        TENSOR_RES = (800, 600)
         date = datetime.now()
-        out = cv2.VideoWriter('videos/recording_'
+
+        # create video recorder
+        self.video_detect_recorder = cv2.VideoWriter('videos/recording_detect_'
                                 + str(date.month) + '-'
                                 + str(date.day) + '-'
                                 + str(date.year) + '_'
-                                + date.strftime('%X')
-                                + '.avi', fourcc, FPS, RES)
-        out2 = cv2.VideoWriter('videos/recording_detect_'
-                        + str(date.month) + '-'
-                        + str(date.day) + '-'
-                        + str(date.year) + '_'
-                        + date.strftime('%X')
-                        + '.avi', fourcc, FPS, TENSOR_RES)
+                                + str(date.hour) + '-'
+                                + str(date.minute) + '-'
+                                + str(date.second) + '_'
+                                + '.avi', fourcc, self.fps, self.image_size, True)
+
+    def record(self):
+        """Record via the usb camera"""
+
+        # create video recorder
+        if self.record:
+            self.startVideoRecorder()
+
+        # start the streaming loop
+        try:
+            while(self.stream.isOpened()):
+                # capture frame by frame
+                ret, frame = self.stream.read()
+
+                # make sure the frames are reading
+                if not ret:
+                    print("Unable to receive frame.")
+                    break
+
+                if self.record:
+                    self.video_recorder.write(frame)
+
+                # show frame
+                if self.show_view:
+                    cv2.imshow("Current View", frame)
+
+                # run until key press 'q'
+                QUIT_KEY = 'q'
+                if cv2.waitKey(1) == ord(QUIT_KEY):
+                    break
+        except KeyboardInterrupt:
+            pass
+
+        # release the capture
+        self.stream.release()
+        if self.record:
+            self.video_stream.release()
+        cv2.destroyAllWindows()
+
+    def detect(self):
+
+        if self.record:
+            startVideoRecorder()
+            startVideoDetectionRecorder()
 
         # initialize detector
         detector = Detect()
         detector.start()
 
         # start the streaming loop
-        while(stream.isOpened()):
-            # capture frame by frame
-            ret, frame = stream.read()
+        try:
+            while(self.stream.isOpened()):
+                # capture frame by frame
+                ret, frame = self.stream.read()
 
-            # make sure the frames are reading
-            if not ret:
-                print("Unable to receive frame.")
-                break
+                # make sure the frames are reading
+                if not ret:
+                    print("Unable to receive frame.")
+                    break
 
-            # write the frame
-            out.write(frame)
+                # send the frame through the object detector
+                detect_frame = detector.detect(frame)
 
-            # send the frame through the object detector
-            frame = detector.detect(frame)
+                # check if user wants to record
+                if self.record:
+                    self.video_recorder.write(frame)
+                    self.video_detect_recorder.write(detect_frame)
 
-            # write the modified frame
-            out2.write(frame)
+                # check if user wants to see the cam's view
+                if self.show_view:
+                    cv2.imshow("Your Eye", frame)
+                    cv2.imshow("God's Eye", detect_frame)
 
-            # show frame
-            # TODO Update Following If-statement
-            if 1 == 1:
-                cv2.imshow("God's Eye", frame)
-
-            # run until key press 'q'
-            QUIT_KEY = 'q'
-            if cv2.waitKey(1) == ord(QUIT_KEY):
-                break
+                # run until key press 'q'
+                QUIT_KEY = 'q'
+                if cv2.waitKey(1) == ord(QUIT_KEY):
+                    break
+        except KeyboardInterrupt:
+            pass
 
         # release the capture
-        stream.release()
-        out.release()
-        out2.release()
+        self.stream.release()
+        if record:
+            self.video_recorder.release()
+            self.video_detect_recorder.release()
         cv2.destroyAllWindows()
-
-
