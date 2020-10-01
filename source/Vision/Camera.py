@@ -173,5 +173,3 @@ class Camera:
         out.release()
         out2.release()
         cv2.destroyAllWindows()
-
-
