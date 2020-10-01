@@ -183,8 +183,15 @@ class Camera:
             pass
 
         # release the capture
+<<<<<<< HEAD
         self.stream.release()
         if record:
             self.video_recorder.release()
             self.video_detect_recorder.release()
         cv2.destroyAllWindows()
+=======
+        stream.release()
+        out.release()
+        out2.release()
+        cv2.destroyAllWindows()
+>>>>>>> fd3c37315dafabdb7c4073bf1c304a1f30f7d1dd
