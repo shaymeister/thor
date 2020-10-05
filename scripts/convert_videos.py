@@ -130,7 +130,8 @@ def create_parser():
             'ogv',
             'webm'],
         action='store',
-        required=True,
+        default='mp4',
+        required=False,
         help='desired output format')
     parser.add_argument(
         '--save_dir',

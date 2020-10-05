@@ -19,7 +19,7 @@ out = cv2.VideoWriter('videos/recording_'
                                 + str(date.year) + '_'
                                 + str(date.hour) + '-'
                                 + str(date.minute) + '-'
-                                + str(date.second) + '_'
+                                + str(date.second)
                                 + '.avi', fourcc, FPS, RES, True)
 # start the streaming loop
 while(stream.isOpened()):
