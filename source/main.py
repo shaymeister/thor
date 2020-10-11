@@ -1,6 +1,6 @@
 from Config import Config
 import Kitt
-import Vision
+from Vision import Vision
 
 def main(config):
     """starting node for Thor"""

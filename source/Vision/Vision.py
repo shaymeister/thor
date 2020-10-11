@@ -18,37 +18,37 @@ class Vision():
 
         # initialize Camera
         self.camera = Camera(
-            cam_num = config.getCamNum(),
-            video_path = config.getVideoPath()
+            cam_num = self.config.getVisionCamNum(),
+            video_path = self.config.getVisionVideoPath()
         )
 
         # see if the user wants to detect or simply record
-        if config.getVisionDetect(): # user wants to detect video
+        if self.config.getVisionDetect(): # user wants to detect video
             # set camera config
             self.camera.configure(
-                fps = config.getVisionFPS(),
-                image_size = config.getVisionImageSize(),
-                record = config.getVisionRecord(),
-                show_view = config.getVisionShowView(),
-                tensor_image_size = config.getVisionTensorImageSize()
+                fps = self.config.getVisionFPS(),
+                image_size = self.config.getVisionImageSize(),
+                record = self.config.getVisionRecord(),
+                show_view = self.config.getVisionShowView(),
+                tensor_image_size = self.config.getVisionTensorImageSize()
             )
 
             # start detection
             self.camera.detect()
-        elif not config.getVisionDetect(): # user doesn't want to detect video
+        elif not self.config.getVisionDetect(): # user doesn't want to detect video
             # set camera config
             self.camera.configure(
-                fps = config.getVisionFPS(),
-                image_size = config.getVisionImageSize(),
-                record = config.getVisionRecord(),
-                show_view = config.getVisionShowView()
+                fps = self.config.getVisionFPS(),
+                image_size = self.config.getVisionImageSize(),
+                record = self.config.getVisionRecord(),
+                show_view = self.config.getVisionShowView()
             )
 
             # start video stream
             self.camera.startVideoStream()
 
             # start recording
-            self.camera.record()
+            self.camera.startVideoStream()
         else: # unexpected error
             print("An unexpected error occurred! config.VISION.DETECT \
                    should be a boolean value.")

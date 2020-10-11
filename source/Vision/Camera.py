@@ -1,6 +1,7 @@
 import cv2
 from datetime import datetime
 import numpy as np
+import sys
 
 from .Detect import Detect
 
@@ -46,21 +47,19 @@ class Camera:
         self.show_view = show_view
         self.tensor_image_size = tensor_image_size
 
-    def startVideoStream():
+    def startVideoStream(self):
         """load video stream from video or camera"""
         
-        if video_path is None: # stream from camera
+        if self.video_path is None: # stream from camera
             stream = cv2.VideoCapture(self.cam_num)
-        elif video_path is not None: # stream from video
+        elif self.video_path is not None: # stream from video
             stream = cv2.VideoCapture(self.video_path)
         else: # unexpected error
             print("An unexpected error occured when starting video stream!")
             sys.exit(0)
 
         # verify stream functionality
-        if stream.isOpened():
-            print("SUCCESS: loaded Video stream")
-        else:
+        if not stream.isOpened():
             print("ERROR: unable to load video stream.")
             sys.exit(0)
 
