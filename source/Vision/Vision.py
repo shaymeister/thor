@@ -1,3 +1,5 @@
+import sys
+
 from .Camera import Camera
 
 class Vision():
@@ -45,9 +47,6 @@ class Vision():
             )
 
             # start video stream
-            self.camera.startVideoStream()
-
-            # start recording
             self.camera.startVideoStream()
         else: # unexpected error
             print("An unexpected error occurred! config.VISION.DETECT \

@@ -36,9 +36,9 @@ class Detect:
         TODO Finish Documentation (Numpy Style)
         """
         # self.__downloadModels attributes
-        self._MODELS_DIR = 'source/Vision/data/models'
+        self._MODELS_DIR = 'source/Vision/models/'
         self._MODEL_DATE = '20200711'
-        self._MODEL_NAME = 'ssd_resnet152_v1_fpn_1024x1024_coco17_tpu-8'
+        self._MODEL_NAME = 'ssd_resnet50_v1_fpn_640x640_coco17_tpu-8'
         self._MODEL_TAR_FILENAME = self._MODEL_NAME + '.tar.gz'
         self._MODELS_DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/tf2/'
         self._MODEL_DOWNLOAD_LINK = self._MODELS_DOWNLOAD_BASE + self._MODEL_DATE + '/' + self._MODEL_TAR_FILENAME
@@ -83,11 +83,14 @@ class Detect:
             tf.config.experimental.set_memory_growth(gpu, True)
 
         # Load pipeline config and build a detection model
+        print(self._PATH_TO_CFG)
         configs = config_util.get_configs_from_pipeline_file(self._PATH_TO_CFG)
         model_config = configs['model']
+        print(model_config)
         self.__detection_model = model_builder.build(model_config=model_config, is_training=False)
 
         # Restore checkpoint
+        print(self._detection_model)
         ckpt = tf.compat.v2.train.Checkpoint(model=self._detection_model)
         ckpt.restore(os.path.join(self.__PATH_TO_CKPT, 'ckpt-0')).expect_partial()
 

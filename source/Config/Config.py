@@ -140,5 +140,3 @@ class Config():
     def getVisionVideoPath(self):
         """return path to prerecorded video(s)"""
         return self._CONFIG.VISION.VIDEO_PATH
-
-

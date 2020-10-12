@@ -3,7 +3,7 @@
 
 # options for K.I.T.T. module
 KITT:
-  START: False
+  START: false
 
 # options for Vision module
 VISION:
@@ -16,4 +16,3 @@ VISION:
   START: true
   TENSOR_IMAGE_SIZE: [800, 600] # width * height
   VIDEO_PATH: null
-  
