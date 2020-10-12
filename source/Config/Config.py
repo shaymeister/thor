@@ -111,6 +111,7 @@ class Config():
 
     def getVisionDetect(self):
         """return boolean attribute specifying whether or not to apply object detection"""
+        return self._CONFIG.VISION.DETECT
 
     def getVisionFPS(self):
         """return integer value specifying frame rate to record"""

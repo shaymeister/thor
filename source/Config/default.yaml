@@ -8,12 +8,12 @@ KITT:
 # options for Vision module
 VISION:
   CAM_NUMBER: 1
-  DETECT: True
+  DETECT: false
   FPS: 30
   IMAGE_SIZE: [640, 480] # width * height
-  RECORD: True
-  SHOW_VIEW: True
-  START: True
+  RECORD: true
+  SHOW_VIEW: true
+  START: true
   TENSOR_IMAGE_SIZE: [800, 600] # width * height
   VIDEO_PATH: null
   
