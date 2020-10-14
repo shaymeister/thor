@@ -46,6 +46,17 @@ class Camera:
         self.tensor_image_size = tensor_image_size
 
     def detect(self):
+        """
+        TODO Finish Documentation Numpy Style
+        """
+
+        if self.video_path is None: # stream from camera
+            self.stream = cv2.VideoCapture(self.cam_num)
+        elif self.video_path is not None: # stream from video
+            self.stream = cv2.VideoCapture(self.video_path)
+        else: # unexpected error
+            print("An unexpected error occurred when starting video stream!")
+            sys.exit(0)
 
         if self.record:
             self.startVideoRecorder()
@@ -53,7 +64,6 @@ class Camera:
 
         # initialize detector
         detector = Detect()
-        detector.start()
 
         # start the streaming loop
         try:
@@ -67,7 +77,7 @@ class Camera:
                     break
 
                 # send the frame through the object detector
-                detect_frame = detector.detect(frame)
+                detect_frame = detector.inference(frame)
 
                 # check if user wants to record
                 if self.record:
@@ -111,8 +121,6 @@ class Camera:
                                 + str(date.second) + '_'
                                 + '.avi', fourcc, self.fps, self.image_size)
 
-        print("created video recorder")
-
     def startVideoRecorder(self):
         """create recorder for video stream"""
 
@@ -149,8 +157,6 @@ class Camera:
 
         # set stream to class attribute
         self.stream = stream
-
-        print(self.record)
 
         # create video recorder
         if self.record:

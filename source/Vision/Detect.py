@@ -9,7 +9,6 @@ import tensorflow as tf
 from object_detection.utils import label_map_util
 from object_detection.utils import config_util
 from object_detection.utils import visualization_utils as viz_utils
-from object_detection.builders import model_builder
 
 import cv2
 
@@ -17,129 +16,92 @@ class Detect:
     """
     TODO Finish Documentation (Numpy Style)
     """
-    _MODELS_DIR = None
-    _MODEL_DATE = None
-    _MODEL_NAME = None
-    _MODEL_TAR_FILENAME = None
-    MODELS_DOWNLOAD_BASE = None
-    _MODEL_DOWNLOAD_LINK = None
-    _PATH_TO_MODEL_TAR = None
-    _PATH_TO_CKPT = None
-    _PATH_TO_CFG = None
-    _detection_model = None
-    _LABEL_FILENAME = None
-    _LABELS_DOWNLOAD_BASE = None
-    _PATH_TO_LABELS = None
+    
+    # class attributes
+    model = None
+    category_index = None
 
-    def __init__(self):
-        """
-        TODO Finish Documentation (Numpy Style)
-        """
-        # self.__downloadModels attributes
-        self._MODELS_DIR = 'source/Vision/models/'
-        self._MODEL_DATE = '20200711'
-        self._MODEL_NAME = 'ssd_resnet50_v1_fpn_640x640_coco17_tpu-8'
-        self._MODEL_TAR_FILENAME = self._MODEL_NAME + '.tar.gz'
-        self._MODELS_DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/tf2/'
-        self._MODEL_DOWNLOAD_LINK = self._MODELS_DOWNLOAD_BASE + self._MODEL_DATE + '/' + self._MODEL_TAR_FILENAME
-        self._PATH_TO_MODEL_TAR = os.path.join(self._MODELS_DIR, self._MODEL_TAR_FILENAME)
-        self._PATH_TO_CKPT = os.path.join(self._MODELS_DIR, os.path.join(self._MODEL_NAME, 'checkpoint/'))
-        self._PATH_TO_CFG = os.path.join(self._MODELS_DIR, os.path.join(self._MODEL_NAME, 'pipeline.config'))
-        self._LABEL_FILENAME = 'mscoco_label_map.pbtxt'
-        self._LABELS_DOWNLOAD_BASE = \
-            'https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/data/'
-        self._PATH_TO_LABELS = os.path.join(self._MODELS_DIR, os.path.join(self._MODEL_NAME, self._LABEL_FILENAME))
-
-    def _downloadModels(self):
+    def __init__(
+            self, 
+            model_path = "models/ssd_resnet50_v1_fpn_640x640_coco17_tpu-8/saved_model",
+            label_path = "models/mscoco_complete_label_map.pbtxt"):
         """
         TODO Finish Documentation (Numpy Style)
         """
 
-        # Download and extract model
-        if not os.path.exists(self._PATH_TO_CKPT):
-            print('Downloading model. This may take a while... ', end='')
-            print(self._MODEL_DOWNLOAD_LINK)
-            urllib.request.urlretrieve(self._MODEL_DOWNLOAD_LINK, self._PATH_TO_MODEL_TAR)
-            tar_file = tarfile.open(self._PATH_TO_MODEL_TAR)
-            tar_file.extractall(self._MODELS_DIR)
-            tar_file.close()
-            os.remove(self._PATH_TO_MODEL_TAR)
-            print('Done')
+        # load model
+        try:
+            self.model = tf.saved_model.load(model_path)
+        except FileNotFoundError:
+            print("Unable to load model from {}".format(model_path))
+        
+        # load label map data
+        try:
+            self.category_index = label_map_util.create_category_index_from_labelmap(label_path, use_display_name=True)
+        except FileNotFoundError:
+            print("Unable to load labels from {}".format(label_path))
 
-        # Download labels file
-        if not os.path.exists(self._PATH_TO_LABELS):
-            print('Downloading label file... ', end='')
-            urllib.request.urlretrieve(self._LABELS_DOWNLOAD_BASE + self._LABEL_FILENAME, self._PATH_TO_LABELS)
-            print('Done')
-
-    def _loadModel(self):
+    def inference(self, img):
         """
         TODO Finish Documentation (Numpy Style)
         """
 
-        # Enable GPU dynamic memory allocation
-        gpus = tf.config.experimental.list_physical_devices('GPU')
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
+        # convert the rgb_img to tensor for model and add it to batch
+        img_tensor = tf.convert_to_tensor(img)
+        img_tensor = img_tensor[tf.newaxis]
 
-        # Load pipeline config and build a detection model
-        print(self._PATH_TO_CFG)
-        configs = config_util.get_configs_from_pipeline_file(self._PATH_TO_CFG)
-        model_config = configs['model']
-        print(model_config)
-        self.__detection_model = model_builder.build(model_config=model_config, is_training=False)
+        # inference argued image
+        detections = self.model(img_tensor)
 
-        # Restore checkpoint
-        print(self._detection_model)
-        ckpt = tf.compat.v2.train.Checkpoint(model=self._detection_model)
-        ckpt.restore(os.path.join(self.__PATH_TO_CKPT, 'ckpt-0')).expect_partial()
 
-    @tf.function
-    def _preprocess(self, image):
-        """
-        TODO Finish Documentation (Numpy Style)
-        """
+        # All outputs are batches tensors.
+        # Convert to numpy arrays, and take index [0] to remove the batch dimension.
+        # We're only interested in the first num_detections.
+        num_detections = int(detections.pop('num_detections'))
+        detections = {key: value[0, :num_detections].numpy()
+                        for key, value in detections.items()}
+        detections['num_detections'] = num_detections
 
-        image, shapes = self._detection_model.preprocess(image)
-        prediction_dict = self._detection_model.predict(image, shapes)
-        detections = self._detection_model.postprocess(prediction_dict, shapes)
+        # detection_classes should be ints.
+        detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
 
-        return detections, prediction_dict, tf.reshape(shapes, [-1])
+        # copy original image
+        image_np_with_detections = img.copy()
 
-    def detect(self, image_np):
-        """
-        TODO Finish Documentation (Numpy Style)
-        """
+        # extract desired information from detections dictionary
+        detection_boxes = detections['detection_boxes']
+        detection_classes = detections['detection_classes']
+        detection_scores = detections['detection_scores']
 
-        category_index = label_map_util.create_category_index_from_labelmap(self.__PATH_TO_LABELS,
-                                                                    use_display_name=True)
+        # create empty attributes to hold desired class
+        boxes = []
+        classes = np.array(0)
+        scores = np.array(0)
 
-        # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-        image_np_expanded = np.expand_dims(image_np, axis=0)
+        # loop through all detections
+        for i in range(len(detection_scores)):
+            # look for human objects
+            if detection_classes[i] == 1: # 1 is human
+                boxes.append(detection_boxes[i])
+                classes = np.append(classes, detection_classes[i])
+                scores = np.append(scores, detection_scores[i])
+            else:
+                continue
+        
+        # convert boxes to numpy array
+        boxes = np.array(boxes)
 
-        input_tensor = tf.convert_to_tensor(np.expand_dims(image_np, 0), dtype=tf.float32)
-        detections, predictions_dict, shapes = self._preprocess(input_tensor)
-
-        label_id_offset = 1
-        image_np_with_detections = image_np.copy()
-
+        # show detections on copied image
         viz_utils.visualize_boxes_and_labels_on_image_array(
             image_np_with_detections,
-            detections['detection_boxes'][0].numpy(),
-            (detections['detection_classes'][0].numpy() + label_id_offset).astype(int),
-            detections['detection_scores'][0].numpy(),
-            category_index,
+            boxes,
+            classes,
+            scores,
+            self.category_index,
             use_normalized_coordinates=True,
             max_boxes_to_draw=200,
             min_score_thresh=.30,
             agnostic_mode=False)
 
-        return cv2.resize(image_np_with_detections, (800, 600))
-
-
-    def start(self):
-        """
-        TODO Finish Documentation (Numpy Style)
-        """
-        self._downloadModels()
-        self._loadModel()
+        # return inference
+        return image_np_with_detections
