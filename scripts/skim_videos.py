@@ -13,7 +13,7 @@ from os import path
 from tqdm import tqdm
 
 
-class VideoFilter():
+class VideoSkimmer():
     """remove RGB frames with no motion from video"""
 
     def __init__(self):
@@ -376,7 +376,7 @@ def main(args):
     """centralize and control all functionality of the script"""
 
     # initialize the VideoFilter
-    video_filter = VideoFilter()
+    video_filter = VideoSkimmer()
 
     # load videos
     video_filter.load_videos(

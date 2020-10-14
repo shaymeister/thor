@@ -1,16 +1,14 @@
 import cv2
 import numpy as np
 import os
-import tarfile
-import urllib.request
 
 import tensorflow as tf
+
+from mtcnn import MTCNN
 
 from object_detection.utils import label_map_util
 from object_detection.utils import config_util
 from object_detection.utils import visualization_utils as viz_utils
-
-import cv2
 
 class Detect:
     """
@@ -20,6 +18,7 @@ class Detect:
     # class attributes
     model = None
     category_index = None
+    detector = None
 
     def __init__(
             self, 
@@ -41,7 +40,7 @@ class Detect:
         except FileNotFoundError:
             print("Unable to load labels from {}".format(label_path))
 
-    def inference(self, img):
+    def inference(self, img, detect_faces=True):
         """
         TODO Finish Documentation (Numpy Style)
         """
@@ -53,7 +52,6 @@ class Detect:
         # inference argued image
         detections = self.model(img_tensor)
 
-
         # All outputs are batches tensors.
         # Convert to numpy arrays, and take index [0] to remove the batch dimension.
         # We're only interested in the first num_detections.
@@ -62,7 +60,7 @@ class Detect:
                         for key, value in detections.items()}
         detections['num_detections'] = num_detections
 
-        # detection_classes should be ints.
+        # detection_classes should be integers
         detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
 
         # copy original image
@@ -75,21 +73,31 @@ class Detect:
 
         # create empty attributes to hold desired class
         boxes = []
-        classes = np.array(0)
-        scores = np.array(0)
+        classes = []
+        scores = []
 
         # loop through all detections
         for i in range(len(detection_scores)):
             # look for human objects
             if detection_classes[i] == 1: # 1 is human
                 boxes.append(detection_boxes[i])
-                classes = np.append(classes, detection_classes[i])
-                scores = np.append(scores, detection_scores[i])
+                classes.append(detection_classes[i])
+                scores.append(detection_scores[i])
             else:
                 continue
         
-        # convert boxes to numpy array
+        # convert lists to numpy arrays
         boxes = np.array(boxes)
+        classes = np.array(classes)
+        scores = np.array(scores)
+
+        if detect_faces:
+            image_np_with_detections = self.detect_faces(
+                                            image=image_np_with_detections,
+                                            boxes=boxes,
+                                            classes=classes,
+                                            scores=scores,
+                                            confidence_threshold=0.3)
 
         # show detections on copied image
         viz_utils.visualize_boxes_and_labels_on_image_array(
@@ -105,3 +113,44 @@ class Detect:
 
         # return inference
         return image_np_with_detections
+
+    def detect_faces(self, image, boxes, classes, scores, confidence_threshold):
+        """
+        TODO Finish Documentation (Numpy Style)
+        """
+        
+        # TODO Make sure human object is in frame
+
+        if self.detector is None:
+            self.detector = MTCNN()
+
+        # detect faces
+        detections = self.detector.detect_faces(image)
+
+        # loop through all face detections
+        for i in range(len(detections)):
+            # convert detections to array
+            face_boxes = detections[i]['box']
+            face_keypoints = detections[i]['keypoints']
+            face_confidence = detections[i]['confidence']
+            
+            # make sure confidence is above threshold
+            if face_confidence < confidence_threshold:
+                continue
+
+            # draw bounding box
+            image = cv2.rectangle(image,
+                    (face_boxes[0], face_boxes[1]),
+                    (face_boxes[0] + face_boxes[2], face_boxes[1] + face_boxes[3]),
+                    (0,155,255),
+                    2)
+
+            # draw keypoints
+            cv2.circle(image,(face_keypoints['left_eye']), 2, (0,155,255), 2)
+            cv2.circle(image,(face_keypoints['right_eye']), 2, (0,155,255), 2)
+            cv2.circle(image,(face_keypoints['nose']), 2, (0,155,255), 2)
+            cv2.circle(image,(face_keypoints['mouth_left']), 2, (0,155,255), 2)
+            cv2.circle(image,(face_keypoints['mouth_right']), 2, (0,155,255), 2)
+
+        # return image
+        return image.copy()

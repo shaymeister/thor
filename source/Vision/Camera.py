@@ -3,7 +3,7 @@ from datetime import datetime
 import numpy as np
 import sys
 
-from .Detect import Detect
+from .detect import Detect
 
 class Camera:
     """Manage and control the USB camera"""

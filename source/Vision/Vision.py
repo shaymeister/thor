@@ -1,6 +1,6 @@
 import sys
 
-from .Camera import Camera
+from .camera import Camera
 
 class Vision():
     """Manage and Control the Vision Module"""
