@@ -1,7 +1,10 @@
 import cv2
 from datetime import datetime
 import numpy as np
+import os
+import re
 import sys
+from tqdm import tqdm
 
 from .detect import Detect
 
@@ -99,11 +102,11 @@ class Camera:
         # release the capture
         self.stream.release()
         if self.record:
-            self.video_stream.release()
+            self.video_recorder.release()
             self.video_detect_recorder.release()
         cv2.destroyAllWindows()
 
-    def startVideoDetectionRecorder(self):
+    def startVideoDetectionRecorder(self, path=None):
         """create recorder for detection video stream"""
 
         # set attributes for video recorder
@@ -111,8 +114,9 @@ class Camera:
         fourcc = cv2.VideoWriter_fourcc(*CODEC)
         date = datetime.now()
 
-        # create video recorder
-        self.video_detect_recorder = cv2.VideoWriter('videos/recording_detect_'
+        if path is None:
+            # create video recorder
+            self.video_detect_recorder = cv2.VideoWriter('videos/recording_detect_'
                                 + str(date.month) + '-'
                                 + str(date.day) + '-'
                                 + str(date.year) + '_'
@@ -120,6 +124,38 @@ class Camera:
                                 + str(date.minute) + '-'
                                 + str(date.second) + '_'
                                 + '.avi', fourcc, self.fps, self.image_size)
+        else:
+            # define regex to extract group number
+            r_group = re.compile(r'(?<=/)group[0-9]{3}(?=/)')
+
+            # get file name and group from video path
+            base_name = "inference_{}".format(os.path.basename(self.video_path))
+            group = re.findall(r_group, self.video_path)[0]
+
+            # define output directory
+            output_dir = 'output'
+
+            # if output dir does not exist, make it
+            if not os.path.isdir(output_dir):
+                os.mkdir(output_dir)
+            
+            # if group in output dir does not exist, make it
+            elif not os.path.isdir(os.path.join(output_dir, group)):
+                os.mkdir(os.path.join(output_dir, group))
+            else:
+                pass
+
+            # define video recorder
+            self.video_detect_recorder = cv2.VideoWriter(
+                                            os.path.join(output_dir,
+                                                         group,
+                                                         base_name),
+                                            fourcc,
+                                            self.fps,
+                                            self.image_size)
+
+            # end function
+            return
 
     def startVideoRecorder(self):
         """create recorder for video stream"""
@@ -192,3 +228,49 @@ class Camera:
         if self.record:
             self.video_recorder.release()
         cv2.destroyAllWindows()
+
+    def process_prerecorded(self):
+        """run prerecorded videos through ml pipeline"""
+
+        # start video stream
+        self.stream = cv2.VideoCapture(self.video_path)
+
+        # get length of video
+        num_frames = self.stream.get(cv2.CAP_PROP_FRAME_COUNT)
+
+        # define video recorder
+        self.startVideoDetectionRecorder(path = self.video_path)
+
+        # initialize detector
+        detector = Detect()
+
+        # define tqdm object
+        progressBar = tqdm(total=num_frames, ncols=100)
+
+        # start the streaming loop
+        try:
+            while(self.stream.isOpened()):
+                # capture frame by frame
+                ret, frame = self.stream.read()
+
+                # make sure the frames are reading
+                if ret:
+                    # send the frame through the object detector
+                    detect_frame = detector.inference(frame)
+                
+                    # update progress bar
+                    progressBar.update(1)
+                
+                    # record detected frame
+                    self.video_detect_recorder.write(detect_frame)
+                elif not ret:
+                    break
+        except KeyboardInterrupt:
+            pass
+
+        # release the capture
+        self.stream.release()
+        self.video_detect_recorder.release()
+
+        # end function
+        return
