@@ -106,13 +106,16 @@ class Camera:
             self.video_detect_recorder.release()
         cv2.destroyAllWindows()
 
-    def startVideoDetectionRecorder(self, path=None):
+    def startVideoDetectionRecorder(self, path=None, image_size=None):
         """create recorder for detection video stream"""
 
         # set attributes for video recorder
         CODEC = 'XVID'
         fourcc = cv2.VideoWriter_fourcc(*CODEC)
         date = datetime.now()
+
+        if image_size is not None:
+            self.image_size = image_size
 
         if path is None:
             # create video recorder
@@ -238,9 +241,6 @@ class Camera:
         # get length of video
         num_frames = self.stream.get(cv2.CAP_PROP_FRAME_COUNT)
 
-        # define video recorder
-        self.startVideoDetectionRecorder(path = self.video_path)
-
         # initialize detector
         detector = Detect()
 
@@ -255,6 +255,13 @@ class Camera:
 
                 # make sure the frames are reading
                 if ret:
+                    # check if video recorder has been initialized
+                    if self.video_detect_recorder is None:
+                        # define video recorder
+                        self.startVideoDetectionRecorder(
+                            path = self.video_path,
+                            image_size = (frame.shape[1], frame.shape[0]))
+
                     # send the frame through the object detector
                     detect_frame = detector.inference(frame)
                 

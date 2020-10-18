@@ -113,7 +113,7 @@ class Vision():
 
                 # add clips to self paths
                 for clip in clips:
-                    paths.append(os.path.join(group_path, clips[0]))
+                    paths.append(os.path.join(group_path, clip))
 
             # update user on total number of clips
             print('VISION.load_data: found {} video clip(s) in {}'.format(
@@ -128,8 +128,6 @@ class Vision():
 
         # load videos
         clips = self.load_data()
-
-        print(clips)
 
         # process all loaded clips
         for clip in clips:
