@@ -233,7 +233,7 @@ def main(args):
 
     # save model
     print('[INFO] Saving Mask Detector Model')
-    model.save(args.model, save_format='h5')
+    model.save(args.model)
 
     # plot the training loss and accuracy
     N = settings['TRAIN_EPOCHS']
