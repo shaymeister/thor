@@ -1,8 +1,6 @@
 """
-The `train_centernet_hourglass.py` script is intented to train EfficientNetD5
+The `train_centernet_hourglass.py` script is intented to train CenterNet
 models via the TensorFlow 2 object detection api
-
-EfficientNet paper: https://arxiv.org/abs/1911.09070
 """
 
 import argparse
