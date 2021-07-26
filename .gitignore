@@ -4,5 +4,4 @@
 videos/
 datasets/
 *.pyc
-models/*
-research/perf_eval/models/*
+
